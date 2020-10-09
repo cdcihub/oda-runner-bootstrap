@@ -27,6 +27,9 @@ function sync-python-modules() {
 function sync-ic() {
     echo -e "\033[34m... synching semi-permanent data (IC tree) to REP_BASE_PROD=${REP_BASE_PROD:?}\033[0m"
     rsync -Lzrtv isdcarc.unige.ch::arc/FTP/arc_distr/ic_tree/prod/ $REP_BASE_PROD/
+
+    mkdir -pv $REP_BASE_PROD/aux/org/ref/
+    rsync -lrtv isdcarc.unige.ch::arc/FTP/arc_distr/NRT/public/aux/org/ref/ $REP_BASE_PROD/aux/org/ref/
 }
     
 function sync-all() {
@@ -37,21 +40,36 @@ function sync-all() {
     done
 }
 
+function test-osa() {
+    which ibis_science_analysis
+    plist ibis_science_analysis
+    echo "managed!"
+}
+
+function test-odahub() {
+    oda-node version
+}
+
+function self-test() {
+    for a_test in test-osa test-odahub; do
+        if $a_test > log-$a_test 2>&1; then
+            echo -e "$a_test \033[32mPASSED\033[0m"
+        else
+            echo -e "$a_test \033[31mFAILED\033[0m"
+            cat $a_test
+        fi
+    done
+}
+
 function run() {
     args=$@
     export HOME_OVERRRIDE=/tmp/home # if many workers, choose non-overlapping
     source /init.sh
     export PATH=/tmp/home/.local/bin:$PATH
+    export REP_BASE_PROD=/data/
+    export INTEGRAL_DDCACHE_ROOT=/data/reduced/ddcache/
 
-    sync-all
-
-    oda-node version
-    
     $args
-}
-
-function sync-data() {
-    echo 
 }
 
 $@
