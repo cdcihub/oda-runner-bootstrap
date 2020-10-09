@@ -20,16 +20,24 @@ function container() {
 function sync-python-modules() {
     echo -e "\033[34m... installing recent dependencies\033[0m"
     pip install --user --upgrade \
-            oda-node\>=0.1.20 \
+            oda-node\>=0.1.21 \
             data-analysis 
 }
 
 function sync-ic() {
     echo -e "\033[34m... synching semi-permanent data (IC tree) to REP_BASE_PROD=${REP_BASE_PROD:?}\033[0m"
-    rsync -Lzrtv isdcarc.unige.ch::arc/FTP/arc_distr/ic_tree/prod/ $REP_BASE_PROD/
+    set -e
+
+    mkdir -pv $REP_BASE_PROD/idx/scw/
+    wget https://www.isdc.unige.ch/~savchenk/GNRL-SCWG-GRP-IDX.fits -O $REP_BASE_PROD/idx/scw/GNRL-SCWG-GRP-IDX.fits
 
     mkdir -pv $REP_BASE_PROD/aux/org/ref/
-    rsync -lrtv isdcarc.unige.ch::arc/FTP/arc_distr/NRT/public/aux/org/ref/ $REP_BASE_PROD/aux/org/ref/
+    rsync -avu ftp://isdcarc.unige.ch/arc/rev_3/aux/org/ref/ $REP_BASE_PROD/aux/org/ref/
+    rsync -avu ftp://isdcarc.unige.ch/arc/rev_3/cat/ $REP_BASE_PROD/cat/
+
+    rsync -Lzrtv isdcarc.unige.ch::arc/FTP/arc_distr/ic_tree/prod/ $REP_BASE_PROD/
+
+    
 }
     
 function sync-all() {
@@ -67,6 +75,8 @@ function run() {
     source /init.sh
     export PATH=/tmp/home/.local/bin:$PATH
     export REP_BASE_PROD=/data/
+    export INTEGRAL_DATA=$REP_BASE_PROD
+    export CURRENT_IC=$REP_BASE_PROD
     export INTEGRAL_DDCACHE_ROOT=/data/reduced/ddcache/
 
     $args
