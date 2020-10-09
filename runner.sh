@@ -31,13 +31,8 @@ function sync-ic() {
     mkdir -pv $REP_BASE_PROD/idx/scw/
     wget https://www.isdc.unige.ch/~savchenk/GNRL-SCWG-GRP-IDX.fits -O $REP_BASE_PROD/idx/scw/GNRL-SCWG-GRP-IDX.fits
 
-    mkdir -pv $REP_BASE_PROD/aux/org/ref/
-    rsync -avu ftp://isdcarc.unige.ch/arc/rev_3/aux/org/ref/ $REP_BASE_PROD/aux/org/ref/
-    rsync -avu ftp://isdcarc.unige.ch/arc/rev_3/cat/ $REP_BASE_PROD/cat/
-
     rsync -Lzrtv isdcarc.unige.ch::arc/FTP/arc_distr/ic_tree/prod/ $REP_BASE_PROD/
 
-    
 }
     
 function sync-all() {
